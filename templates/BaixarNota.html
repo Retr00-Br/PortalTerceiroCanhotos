@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Registrar Baixa - NF {{ nota.numero_nota }}</h5>
+
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Status da Entrega:</label>
+                        <select class="form-select" id="status_entrega" name="status_entrega" onchange="toggleMotivo(this.value)">
+                            <option value="TOTALMENTE_ENTREGUE">Totalmente Entregue</option>
+                            <option value="PARCIALMENTE_ENTREGUE">Parcialmente Entregue (com ressalva/recusa)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 d-none" id="divMotivo">
+                        <label class="form-label fw-bold">Motivo da Recusa / Ressalva:</label>
+                        <textarea class="form-control" name="motivo_recusa" rows="3" placeholder="Descreva o motivo..."></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Foto do Canhoto / Ressalva:</label>
+                        <input type="file" class="form-control" name="foto" accept="image/*" capture="environment" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 btn-mobile mb-2">Confirmar Baixa</button>
+                    <a href="{{ url_for('meus_romaneios') }}" class="btn btn-outline-secondary w-100">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleMotivo(valor) {
+        const div = document.getElementById('divMotivo');
+        if (valor === 'PARCIALMENTE_ENTREGUE') {
+            div.classList.remove('d-none');
+        } else {
+            div.classList.add('d-none');
+        }
+    }
+</script>
+{% endblock %}
