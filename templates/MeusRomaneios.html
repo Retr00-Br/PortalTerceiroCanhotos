@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h4 class="mb-3">Meus Romaneios</h4>
+
+{% if not romaneios %}
+    <div class="alert alert-info">Nenhum romaneio atribuído no momento.</div>
+{% endif %}
+
+{% for romaneio in romaneios %}
+<div class="card mb-3 shadow-sm card-romaneio">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="card-title mb-0">Romaneio: {{ romaneio.codigo_romaneio }}</h5>
+            <span class="badge {% if romaneio.status == 'CONCLUIDO' %}bg-success{% else %}bg-warning text-dark{% endif %} badge-status">
+                {{ romaneio.status }}
+            </span>
+        </div>
+        
+        <hr>
+        <h6 class="text-muted">Notas Fiscais:</h6>
+        <div class="list-group">
+            {% for nota in romaneio.notas %}
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>NF: {{ nota.numero_nota }}</strong>
+                    <br>
+                    <small class="text-muted">Status: {{ nota.status_entrega }}</small>
+                </div>
+                {% if nota.status_entrega == 'PENDENTE' %}
+                    <a href="{{ url_for('baixar_nota', nota_id=nota.id) }}" class="btn btn-sm btn-primary">Dar Baixa</a>
+                {% else %}
+                    <span class="badge bg-secondary">Baixada</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
