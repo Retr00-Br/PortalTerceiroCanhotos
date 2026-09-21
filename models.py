@@ -4,38 +4,52 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
+class Transportadora(db.Model):
+    __tablename__ = 'transportadora'
+
+    idTransportadora = db.Column(db.Integer, primary_key=True)
+    Nome = db.Column(db.String(95), nullable=False)
+    CNPJ = db.Column(db.String(14), unique=True, nullable=False)
+
+    usuarios = db.relationship('Usuario', backref='transportadora', lazy=True)
+    romaneios = db.relationship('Romaneio', backref='transportadora', lazy=True)
+
 
 class Usuario(UserMixin, db.Model):
     __tablename__ = 'usuarios'
 
-    id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    senha = db.Column(db.String(255), nullable=False)
-    perfil = db.Column(db.String(20), default='TERCEIRO')  # 'ADMIN' ou 'TERCEIRO'
+    idUsuario = db.Column(db.Integer, primary_key=True)
+    TransportadoraID = db.Column(db.Integer, db.ForeignKey('transportadora.idTransportadora'), nullable=True)
+    Nome = db.Column(db.String(30), nullable=False)
+    Telefone = db.Column(db.String(11), nullable=False)
+    Senha = db.Column(db.String(255), nullable=False)
 
-    romaneios = db.relationship('Romaneio', backref='usuario', lazy=True)
+    # Função para adaptar com o Flask-Login
+    def get_id(self):
+        return str(self.idUsuario)
 
 
 class Romaneio(db.Model):
     __tablename__ = 'romaneios'
 
-    id = db.Column(db.Integer, primary_key=True)
-    codigo_romaneio = db.Column(db.String(50), unique=True, nullable=False)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
-    status = db.Column(db.String(30), default='EM_TRANSITO')  # 'EM_TRANSITO', 'CONCLUIDO'
-    data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
+    idRomaneio = db.Column(db.Integer, primary_key=True)
+    TransportadoraID = db.Column(db.Integer, db.ForeignKey('transportadora.idTransportadora'), nullable=False)
+    NumeroRomaneio = db.Column(db.String(50), nullable=False)
+    Status = db.Column(db.String(45), default='EM_TRANSITO')
+    DataCriacao = db.Column(db.DateTime, default=datetime.utcnow)
 
     notas = db.relationship('NotaFiscal', backref='romaneio', lazy=True)
 
 
 class NotaFiscal(db.Model):
-    __tablename__ = 'notas_fiscais'
+    __tablename__ = 'notasfiscais'
 
-    id = db.Column(db.Integer, primary_key=True)
-    numero_nota = db.Column(db.String(50), nullable=False)
-    romaneio_id = db.Column(db.Integer, db.ForeignKey('romaneios.id'), nullable=False)
-    status_entrega = db.Column(db.String(30), default='PENDENTE')  # 'PENDENTE', 'TOTALMENTE_ENTREGUE', 'PARCIALMENTE_ENTREGUE'
-    motivo_recusa = db.Column(db.Text, nullable=True)
-    url_foto_canhoto = db.Column(db.String(255), nullable=True)
-    data_atualizacao = db.Column(db.DateTime, nullable=True)
+    idNF = db.Column(db.Integer, primary_key=True)
+    idRomaneio = db.Column(db.Integer, db.ForeignKey('romaneios.idRomaneio'), nullable=False)
+    NumeroNF = db.Column(db.String(50), nullable=False)
+    ValorNF = db.Column(db.Numeric(10, 2))
+    Cliente = db.Column(db.String(95))
+    StatusEntrega = db.Column(db.String(30), default='PENDENTE')
+    MotivoDevolucao = db.Column(db.Text)
+    UrlFotoCanhoto = db.Column(db.String(255))
+    DataAtualizacao = db.Column(db.DateTime)
